@@ -6,6 +6,5 @@
 ## Generate npm client
 
 ```sh
-pnpm generate
-pnpm publish-client
+pnpm publish:client
 ```  

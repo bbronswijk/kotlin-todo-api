@@ -5,8 +5,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "generate": "openapi-generator-cli generate && cd npm-client && pnpm i",
-    "publish-client": "cd npm-client && npm publish --access public"
+    "publish:client": "node increment-version.js && openapi-generator-cli generate && cd npm-client && pnpm i && npm publish --access public"
   },
   "workspaces": [
     "npm-client"
