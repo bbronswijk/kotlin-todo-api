@@ -13,7 +13,7 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import org.springframework.web.cors.reactive.CorsWebFilter
-import org.springframework.web.reactive.function.server.*
+import org.springframework.web.reactive.function.server.coRouter
 import org.springframework.web.reactive.function.server.EntityResponse.fromObject
 
 @SpringBootApplication
@@ -27,22 +27,7 @@ fun main(args: Array<String>) {
 }
 
 val beans = beans {
-	bean(::routes)
-	bean<TodoHandler>()
 	bean(::corsSettings)
-}
-
-fun routes(
-	todoHandler: TodoHandler,
-) = coRouter {
-	"api".nest {
-		GET("/todos", todoHandler::find)
-		POST("/todos", todoHandler::create)
-		POST("/todos/import", todoHandler::createMany)
-		PATCH("/todos/{id}", todoHandler::update)
-		DELETE("/todos/{id}", todoHandler::delete)
-		DELETE("/todos", todoHandler::deleteMany)
-	}
 }
 
 fun corsSettings(): CorsWebFilter {
