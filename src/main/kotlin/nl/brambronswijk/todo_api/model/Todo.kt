@@ -6,7 +6,7 @@ import java.util.UUID
 
 @Table(name = "todo", schema = "todo")
 data class Todo(
-    @Id val id: UUID? = null,
+    @Id val id: UUID = UUID.randomUUID(),
     val title: String,
     val completed: Boolean,
 )

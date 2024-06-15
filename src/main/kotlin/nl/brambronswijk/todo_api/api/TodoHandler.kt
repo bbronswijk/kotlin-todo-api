@@ -1,6 +1,5 @@
 package nl.brambronswijk.todo_api.api
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import nl.brambronswijk.todo_api.model.*
 import nl.brambronswijk.todo_api.repository.TodoRepository
@@ -18,8 +17,8 @@ class TodoHandler(private val databaseClient: DatabaseClient, private val todoRe
      * CoroutineCrudRepository does not support pagination.
      */
     @GetMapping("/todos")
-    suspend fun find(@RequestParam offset: Int?, @RequestParam limit: Int?): List<Todo> {
-        return databaseClient.sql("SELECT * FROM todo.todo OFFSET :offset LIMIT :limit")
+    suspend fun find(@RequestParam offset: Int?, @RequestParam limit: Int?): GetTodosResponse {
+        val todos: List<Todo> = databaseClient.sql("SELECT * FROM todo.todo OFFSET :offset LIMIT :limit")
             .bind("offset", offset ?: 0)
             .bind("limit", limit ?: 10)
             .fetch()
@@ -31,35 +30,41 @@ class TodoHandler(private val databaseClient: DatabaseClient, private val todoRe
                 title = it["title"] as String,
                 completed = it["completed"] as Boolean
             ) }
+
+        return GetTodosResponse(data = todos);
     }
 
     /**
      * Create a new todo
      */
     @PostMapping("/todos")
-    suspend fun create(@RequestBody todo: CreateRequest): Todo {
-        return todoRepository.save(
+    suspend fun create(@RequestBody todo: CreateTodoRequest): CreateTodoResponse {
+        val created: Todo = todoRepository.save(
             Todo(title = todo.title, completed = todo.completed)
         )
+
+        return CreateTodoResponse(data = created)
     }
 
     /**
      * Create many todos at once
      */
     @PostMapping("/todos/import")
-    suspend fun createMany(@RequestBody request: List<CreateRequest>): Flow<Todo> {
-        val todos: List<Todo> = request
+    suspend fun createMany(@RequestBody request: CreateManyTodosRequest): CreateManyTodoResponse {
+        val todos: List<Todo> = request.todos
             .map { todo -> Todo(title = todo.title, completed = todo.completed)}
 
-        return todoRepository.saveAll(todos)
+        val created: List<Todo> = todoRepository.saveAll(todos).toList()
+
+        return CreateManyTodoResponse(data = created)
     }
 
     /**
      * Update a todo
      */
     @PatchMapping("/todos/{todoId}")
-    suspend fun update(@PathVariable todoId: UUID, @RequestBody todo: UpdateRequest): Todo? {
-        val existingTodo = todoRepository.findById(todoId) ?: return null
+    suspend fun update(@PathVariable todoId: UUID, @RequestBody todo: UpdateTodoRequest): PatchTodoResponse {
+        val existingTodo = todoRepository.findById(todoId) ?: return PatchTodoResponse(data = null)
 
         val updated = todoRepository.save(
             existingTodo.copy(
@@ -68,25 +73,25 @@ class TodoHandler(private val databaseClient: DatabaseClient, private val todoRe
             )
         )
 
-        return todoRepository.save(updated)
+        return PatchTodoResponse(data = updated)
     }
 
     /**
      * Delete a todo
      */
     @DeleteMapping("/todos/{todoId}")
-    suspend fun delete(@PathVariable todoId: UUID): DeleteResponse {
+    suspend fun delete(@PathVariable todoId: UUID): DeleteTodoResponse {
         todoRepository.deleteById(todoId)
 
-        return DeleteResponse(todoId)
+        return DeleteTodoResponse(todoId)
     }
     /**
      * Delete many todos at once
      */
     @DeleteMapping("/todos")
-    suspend fun deleteMany(@RequestBody request: DeleteManyRequest): List<UUID> {
+    suspend fun deleteMany(@RequestBody request: DeleteManyTodosRequest): DeleteManyTodosResponse {
         todoRepository.deleteAllById(request.deleteIds)
 
-        return request.deleteIds
+        return DeleteManyTodosResponse(data = request.deleteIds)
     }
 }
