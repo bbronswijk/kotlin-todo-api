@@ -38,3 +38,8 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### NPM ###
+.idea/
+npm-client/
+node_modules

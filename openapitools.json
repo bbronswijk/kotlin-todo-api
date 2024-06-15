@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.6.0",
+    "generators": {
+      "kotlin-todo-api": {
+        "generatorName": "typescript-fetch",
+        "output": "#{cwd}/npm-client",
+        "inputSpec": "http://localhost:8080/v3/api-docs",
+        "gitRepoId": "kotlin-todo-api-client",
+        "gitHost": "github.com",
+        "gitUserId": "bbronswijk",
+        "additionalProperties": {
+          "npmName": "@bbronswijk/kotlin-todo-api-client",
+          "supportsES6": "true",
+          "npmVersion": "1.0.2",
+          "withInterfaces": true
+        }
+      }
+    }
+  }
+}
