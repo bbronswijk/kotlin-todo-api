@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "generate": "openapi-generator-cli generate && cd npm-client && pnpm i",
-    "publish-client": "npm publish --workspace npm-client --access public"
+    "publish-client": "cd npm-client && npm publish --access public"
   },
   "workspaces": [
     "npm-client"
